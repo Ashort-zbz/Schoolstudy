@@ -1,1 +1,1 @@
-# Schoolstudy
+# SchoolStudy
