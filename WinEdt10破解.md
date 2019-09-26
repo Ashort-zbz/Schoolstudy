@@ -1,4 +1,4 @@
-#WinEdt10破解
+#WinEdt10破解\n
 1 打开winedt，到菜单options-->options interface...，这个选项包含了WinEdt的所有可配置的参数个功能，非常强大。单击子菜单项，已进行相关设置。 
 
 
