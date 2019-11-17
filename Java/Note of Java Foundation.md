@@ -191,3 +191,182 @@ public static void main(final String[] args) {
 
 #### 2.2.3、循环控制
 
+1、break语句
+
+break可跳出switch结构，在循环结构中也可跳出当前循环。在循环嵌套的情况下，break语句将只会使程序流程跳出包含它的最内层的循环结构，即只跳出一层循环。
+
+例：
+
+```java
+public static void main(final String[] args) {
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 6; j++){
+                if (j == 4) {    //如果j等于4就结束内部循环
+                    break;
+                }
+                System.out.println("i=" + i + "j=" + j);
+            }
+        }
+	}
+```
+
+如果想让 break 跳出外层循环，Java 提供了“标签”的功能，语法如下：
+
+```java
+标签名：循环体{
+    break 标签名;
+}
+```
+
+- break 标签名：break 跳出指定的循环体，次循环体的标签名必须与 break 的标签名一致。带有标签的 break 可以指定跳出的循环，这个循环可以是内层循环，也可以是外层循环。
+
+例：
+
+```java
+public static void main(final String[] args) {
+        Loop:for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 6; j++){
+                if (j == 4) {
+                    break Loop;
+                }
+                System.out.println("i=" + i + "j=" + j);
+            }
+        }  
+}
+```
+
+2、continue 语句
+
+continue 语句是对 break 语句的补充。continue 不是立即跳出循环体，而是跳出本次循环结束前的语句，回到循环的条件测试部分，重新开始执行循环。在 while 和 do...while 循环中，continue 语句使控制直接回到条件测试部分。在 for 循环语句中遇到 continue 后，首先执行循环的增量部分，然后进行条件测试。
+
+例：输出1~20之间的奇数，使用 continue 跳出循环。
+
+```java
+public static void main(final String[] args) {
+        for (int i = 1; i < 20; i++) {
+            if (i % 2 == 0) {    //如果i是偶数，跳到下一循环
+                continue;
+            }
+            System.out.println(i);    //输出i
+        }
+	}
+```
+
+和 break 语句一样，continue 语句也支持标签功能，语法与 break 相似。
+
+最后给出一个实例，打印菱形，行数由用户输入，且只能输入奇数：
+
+```java
+public static void main(final String[] args) {
+        Scanner in = new Scanner(System.in);
+        System.out.println("请输入菱形的行数，只能为奇数：");
+        int lineCount = 0;
+        lineCount = in.nextInt();// 输出的菱形有多少行，请赋值成奇数
+
+		int maxLineNum = (lineCount + 1) / 2;// 计算星号最多的一行
+		for (int i = 1; i <= maxLineNum; i++) {// 循环菱形数量越来越多的几行
+			for (int space = 1; space <= maxLineNum - i; space++) {// 输出空格，数量=最后一行-当前行数
+				System.out.print("  ");
+			}
+			for (int star = 1; star <= (i * 2) - 1; star++) {// 输出星号，数量=行数*2-1
+				System.out.print("* ");
+			}
+			System.out.println();// 换行
+		}
+
+		int declineCount = lineCount - maxLineNum;// 计算剩下的几行，这几行星号的数量是递减的
+		for (int i = 1; i <= declineCount; i++) {// 循环菱形数量越来越少的行数
+			for (int space = 1; space <= i; space++) {// 输出空格，数量等于当前的行数
+				System.out.print("  ");
+			}
+			for (int star = 1; star <= (declineCount - i + 1) * 2 - 1; star++) {// 输出星号，数量等于（总数-当前行数）*2-1
+				System.out.print("* ");
+			}
+			System.out.println();
+		}
+	}
+```
+
+## Chapter Three    Array
+
+ 数据可以存放在变量里，每一个变量有一个名字，有一个类型，还有它的生存空间。如果我们需要保存一些相同类型、相似含义、相同生存空间的数据，我们可以用数组来保存这些数据，而不是用很多个独立的变量。数组是长度固定的数据结构，用来存放指定的类型的数据。一个数组里可以有很多个数据，所有的数据的类型都是相同的。 
+
+### 3.1、初识数组
+
+数组是一种容器，**一旦创建之后就不能改变其大小**。每个数组都有一个内部成员 length，它会告诉数组元素的数量。数组是一种数据结构，数组中每个数据叫做元素，所有元素具有相同的数据类型。当在程序中需要处理一组数据，或者传递一组数据时，可用数组。先来看一个程序，计算用户输入的数字的平均数，并输出所有大于平均数的数。
+
+例：
+
+```java
+public static void main(final String[] args) {
+        Scanner in = new Scanner(System.in);
+        int x;
+        int[] numbers = new int[100];
+        double sum = 0;
+        int cnt = 0;
+        x = in.nextInt();
+
+        while( x != -1){
+            numbers[cnt] = x;
+            sum += x;
+            cnt++;
+            x = in.nextInt();
+        }
+
+        if (cnt > 0) {
+            double average = sum / cnt;
+            for (int i = 0; i < cnt; i++) {
+                if (numbers[i] > average) {
+                    System.out.println(numbers[i]);
+                }
+            }
+            System.out.println(average);
+        }
+	}
+```
+
+其中我们做了一些关于数组的事情：
+
+- 定义数组：`int[] numbers = new int[100];`
+- for 循环遍历数组
+- ...
+
+1、创建数组
+
+创建数组有两种方法
+
+1）先声明，再用 new 运算符进行内存分配
+
+声明方式：`数组元素类型 数组名字[];` 或 `数组元素类型[] 数组名字;`，符号"[]"表明该变量是一个数组类型变量。
+
+声明之后还不能立即访问它的任何元素，因为声明数组只是给出数组的名字和元素的数据类型，要想真正使用数组，还要给它分配内存空间。分配内存的方式为：`数组名 = new 数组元素类型[数组元素个数]`。使用 new 关键字分配内存时，整形数组中各元素的初始值均为0。
+
+2）声明的同时为数组分配内存
+
+推荐使用这种方法，格式为：`<类型>[] <名字> = new <类型>[元素个数];` 或者 `<类型> <名字>[] = new <类型>[元素个数];`。上面的代码就用了第一种方法。
+
+在这里要注意，定义时**元素个数必须为整数**，**元素个数必须明确**，**元素个数可以是变量**。
+
+2、初始化数组
+
+初始化和变量的初始化意义相似，有两种格式：
+
+```java
+int arr[] = new int[]{1.2.3.4.5};
+int arr[] = {12,34,56};
+```
+
+这样既创建了数组，又进行了初始化操作。
+
+3、二维数组的创建
+
+二维数组可看作是特殊的一维数组，创建方式与一维数组的创建方式类似。举例说明：
+
+```java
+int arr[][]; //first
+arr = new int[2][4];
+
+int arr[][] = new int[2][4]; //second
+```
+
+那么类似的，二维数组的初始化与一维数组也类似，`int arr[][] = {{12, 0},{34,0}};`
