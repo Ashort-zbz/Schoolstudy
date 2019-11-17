@@ -2,7 +2,7 @@
 
 1、编程序，计算下面分段函数的值（if-else）
 
-​    ![img](file:///C:/Users/12970/AppData/Local/Temp/msohtmlclip1/01/clip_image002.gif)
+​    ![photo.gif](https://upload-images.jianshu.io/upload_images/19680844-dae2a21764e9ea45.gif?imageMogr2/auto-orient/strip)
 
 ```c
 #include <stdio.h>
