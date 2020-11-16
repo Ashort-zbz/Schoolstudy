@@ -276,3 +276,93 @@ public class App {
 ```
 
 类的名字必须和文件名相同。如果你像现在创建一个独立运行的程序，那么文件中必须存在某个类与该文件同名，且那个类必须包含一个名为 **main()** 的方法。形如：`public static void main(String[] args) {`。其中 **public** 关键字指这是一个可由外部调用的方法。**main()** 方法的参数是一个 **String** 对象的数组。在这个程序中并未用到 **args**，但是 Java编译器要求必须这样做，因为 **args** 要用来存储命令行参数。
+
+### 2.8 注释和嵌入式文档
+
+Java 有两种注释风格，一种是传统注释，以“/\*"开始，"*/"结束，可跨很多行。很多程序员在连续的注释内容的每行都以一个”\*“开头：
+
+```java
+/*This is a comment
+ *that continues
+ *across lines
+ */
+//上面等于下面
+/*This is a comment that
+continues across lines*/
+```
+
+另一种注释是“单行注释”，以“//”起头，这种更方便，更常用。
+
+#### 2.8.1 注释文档
+
+写代码文档的最大问题，就是对文档的维护。若代码与文档是分离的，那么每次改代码都需要修改相应的文档。可以将代码和文档“链接”起来。为实现这个目的，必须使用一种特殊的注释语法来标记文档；此外还需要一个工具，用于提取那些注释，并将其装换成有用的形式。
+
+Java 提供 javadoc，是一个用于提取注释的工具，是 JDK 安装的一部分。输出的是一个 HTML 文件，可以用web 浏览器查看。这个工具就使得只需创建和维护单一的源文件，并自动生成有用的文档。
+
+#### 2.8.2 语法
+
+所有 javadoc 命令只能在 “/\*\*" 注释中出现，和通常一样，注释结束于 ”\*/“。使用 javadoc 的方式主要有两种：嵌入 HTML，或使用”文档标签“。独立文档标签是一些以 **”@“** 字符开头的命令，且要置于注释行最前面。而 ”行内文档标签“ 则可以出现在 javadoc 注释任何地方，它们也是 ”@“ 开头，但要在花括号里。
+
+一共有三种类型的注释文档，分别对应于注释位置后面的三种元素：类、域和方法。
+
+注意，javadoc 只能为 **public** （公共）和 **protected** （受保护）成员进行文档注释。 **private**（私有）是程序员不希望用户可以看到的。
+
+#### 2.8.3 嵌入式 HTML
+
+**javadoc** 通过生成的 HTML 文档传送 HTML 命令，使得能充分利用 HTML。当然其主要目的还是为了对代码进行格式化。在文档注释中，位于每一行开头的星号和前导空格都会被 javadoc 丢弃。 javadoc会对所有内容重新格式化，使其与标准文档外观一致。不要在嵌入式 HTML 中使用标题标签，javadoc 会插入自己的标题，而你自己的标题可能会和他们发生冲突。
+
+#### 2.8.4 一些标签
+
+在使用 javadoc 处理重要事情之前，应该先去 **JDK 文档**中查阅 javadoc 参考。
+
+1. @see：引用其他类
+
+@see 标签允许用户引用其他类的文档。 javadoc 会在其生成的 HTML 文件中，通过 @see 链接到其他文档。
+
+2. {@docRoot}
+
+产生到文档根目录的相对路径，用于文档树页面的显示超链接。
+
+3. @version
+
+生成版本信息
+
+4. @author
+
+5. @deprecated
+
+用于指出一些就特性已经由改进的新特性所取代，建议用户不要再使用这些旧特性，因为在不久的将来它们可能会被删除。
+
+#### 2.8.5 文档示例
+
+```java
+//:src/App.java
+
+import java.util.*;
+
+/**The first Thinking in Java example program.
+ * Displays a string and today's data
+ * @author zbz
+ * @version 4.0 
+ */
+public class App {
+    /**
+     * 
+     * @param args array of string arguments
+     * @throws Exception No exceptions thrown
+     */
+    public static void main(String[] args) throws Exception {
+        
+        System.out.println("Hello, it's:");
+		System.out.println(new Date());
+        
+    }
+}/*Output:(55% match) 
+
+*///:~
+
+```
+
+### 2.9 编码风格
+
+在“ Java 编程语言编码约定” 中，代码风格这样约定：类名的首字母要大写，如果类名由几个单词构成，那么把它们并在一起，每个单词首字母大写。这种风格被称作“驼峰风格”。**只是**标识符的第一个字母采用小写。
