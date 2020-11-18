@@ -366,3 +366,195 @@ public class App {
 ### 2.9 编码风格
 
 在“ Java 编程语言编码约定” 中，代码风格这样约定：类名的首字母要大写，如果类名由几个单词构成，那么把它们并在一起，每个单词首字母大写。这种风格被称作“驼峰风格”。**只是**标识符的第一个字母采用小写。
+
+
+
+## 第三章 操作符
+
+在最底层，Java 中的数据是通过操作符来操作的。
+
+Java 是建立在 C++ 基础之上的，所以 C 和 C++ 熟悉的人应该非常熟悉 Java大多数操作符。Java 也做了一些改进与简化。
+
+### 3.1 更简单的打印语句
+
+在前面介绍了 Java 的打印语句：`System.out.println("...");`
+
+可以看到这条语句不仅涉及许多类型（有许多多余的链接），而且它读起来也很费劲。在 Java SE5 中新增加了一个概念——静态导入（static import），并将创建一个小类库来简化打印语句编写。
+
+```java
+import java.util.*;
+import static java.lang.System.out;
+
+public class Example27 {
+  public static void main(String[] args) throws Exception {  
+      out.println("Hello, it's:");
+      out.println(new Date());     
+  }
+}
+```
+
+改写后程序清爽很多。注意上面程序的第二行代码：`import static java.lang.System.out;`，import 中插入了 static。尽管使用静态导入可以很好的简化代码，但是它并非在任何场合都显得恰当。如果在代码中只有少量的打印语句，还是先用 import 然后编写完整的 `System.out.println();`。
+
+### 3.2 使用 Java 操作符
+
++，-，*，/号用法与其他编程语言类似。几乎所有操作符都只能操作“基本类型”。例外的是 “=”，“==”，“!=”，这些操作符能操作所有的对象。除此之外，**String** 类支持 “+” 和 “+=”。
+
+### 3.3 优先级
+
+操作符的优先级决定了各部分的计算顺序，如果不确定优先级，应该用括号明确规定计算顺序。
+
+```java
+public class Example31 {
+	public static void main(String[] args) {
+		int x=1,y=2,z=3;
+		int a=x+y-2/2+z;
+		int b=x+(y-2)/(2+z);
+		System.out.println("a="+a+"\tb="+b);
+	}
+}
+/*Output:
+ * a=5 b=1
+ * */
+```
+
+上面例子可以看出有无括号的输出有很大不同。
+
+注意，`System.out.println()`语句中包含 “+” 操作符，在这种上下文环境中，“+” 意味着“字符串连接”，并且如果有必要，还要执行“字符串转换”。
+
+### 3.4 赋值
+
+Java 中对基本数据类型的赋值是很简单的。基本类型存储了实际的数值，而并非指向一个对象的引用，所以在为其赋值的时候，就是直接将一个地方的内容复制到另一个地方。但是，要注意给对象“赋值”的情况。对一个对象进行操作，真正操作的是对对象的引用，所以”将一个对象赋值给另一个对象“，实际上是将”引用“从一个地方复制到另一个地方。即若对对象使用 c=d，那么 c 和 d 都原本只有 d 指向的那个对象。
+
+```java
+class Tank{
+	int level;
+}
+public class Example32 {
+	public static void main(String[] args) {
+		Tank t1 = new Tank();
+        Tank t2 = new Tank();
+        t1.level = 9;
+        t2.level = 47;
+        System.out.println("1:t1.level:"+t1.level+",t2.level:"+t2.level);
+        t1=t2;
+        System.out.println("2:t1.level:"+t1.level+",t2.level:"+t2.level);
+        t1.level=27;
+        System.out.println("3:t1.level:"+t1.level+",t2.level:"+t2.level);
+        
+	}
+}/*Output:
+*1:t1.level:9,t2.level:47
+*2:t1.level:47,t2.level:47
+*3:t1.level:27,t2.level:27
+*///:~
+```
+
+原本 t1 包含的对对象的引用是指向一个值为 9 的对象。在对 t1 赋值的时候，这个引用被 t2 的引用覆盖，也就是丢失了；然后 t1 和 t2 包含同一个引用，指向相同的对象，所以后面的修改 t1 的同时也改变了 t2。而那个原本的 t1 的引用的对象 9 会由“垃圾回收器”自动清理。
+
+这种现象被称为“别名现象”，是 Java 操作对象的一种基本方式。在上面的例子中，若想避免这样的现象，可以这样写`t1.level=t2.level`，这样就可以使两个对象彼此独立，而不是将 t1 和 t2 绑定到相同的对象。从现在开始就要留意，为对象赋值可能会产生意想不到的结果。
+
+#### 3.4.1 方法调用中的别名问题
+
+将一个对象传递给方法时，也会产生别名问题：
+
+```java
+class Letter{
+	char c;
+}
+public class Examole33 {
+	static void f(Letter y) {
+		y.c='z';
+	}
+	public static void main(String[] args) {
+		Letter x=new Letter();
+		x.c='a';
+		System.out.println("1:x.c:"+x.c);
+		f(x);
+		System.out.println("2:x.c:"+x.c);
+	}
+}/*Output:
+*1:x.c:a
+*2:x.c:z
+*///:~
+```
+
+在许多其他语言中，方法 f() 似乎要在它的作用域内复制参数 Letter y 的一个副本；但实际上只是传递了一个引用。所以`y.c='z';`实际上改变的是 f() 之外的对象。别名引起的问题及其解决办法是个很复杂的话题，但是现在就应该知道它的存在，并且在使用中注意这个陷阱。
+
+### 3.5 算术操作符
+
+Java 基本算术操作符与其他大多数程序设计语言相同，例子：
+
+```java
+import java.util.*;
+
+public class Example34 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Random rand = new Random(47);
+		int i, j, k;
+		j = rand.nextInt(100) + 1;
+		System.out.println("j:" + j);
+		k = rand.nextInt(100) + 1;
+		System.out.println("k:" + k);
+		i = j + k;
+		System.out.println("j+k:" + i);
+		i = j - k;
+		System.out.println("j-k:" + i);
+		i = k / j;
+		System.out.println("k/j:" + i);
+		i = k * j;
+		System.out.println("j*k:" + i);
+		i = k % j;
+		System.out.println("k%j:" + i);
+		j %= k;
+		System.out.println("j%k:" + j);
+		// Float u,v,w;
+		float u, v, w;
+		v = rand.nextFloat();
+		System.out.println("v:" + v);
+		w = rand.nextFloat();
+		System.out.println("w:" + w);
+		u = v + w;
+		System.out.println("v+w:" + u);
+		u = v - w;
+		System.out.println("v-w:" + u);
+		u = v * w;
+		System.out.println("v*w:" + u);
+		u = v / w;
+		System.out.println("v/w:" + u);
+		// The following also works for char
+		// byte, short, int, long, and double
+		u += v;
+		System.out.println("u+=v:" + u);
+		u -= v;
+		System.out.println("u-=v:" + u);
+		u *= v;
+		System.out.println("u*=v:" + u);
+		u /= v;
+		System.out.println("u/=v:" + u);
+	}
+
+}/*Output:
+j:59
+k:56
+j+k:115
+j-k:3
+k/j:0
+j*k:3304
+k%j:56
+j%k:3
+v:0.5309454
+w:0.0534122
+v+w:0.5843576
+v-w:0.47753322
+v*w:0.028358962
+v/w:9.940527
+u+=v:10.471473
+u-=v:9.940527
+u*=v:5.2778773
+u/=v:9.940527
+*/
+
+```
+
