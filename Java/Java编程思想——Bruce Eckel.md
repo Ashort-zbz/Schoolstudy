@@ -423,7 +423,7 @@ public class Example31 {
 
 ### 3.4 赋值
 
-Java 中对基本数据类型的赋值是很简单的。基本类型存储了实际的数值，而并非指向一个对象的引用，所以在为其赋值的时候，就是直接将一个地方的内容复制到另一个地方。但是，要注意给对象“赋值”的情况。对一个对象进行操作，真正操作的是对对象的引用，所以”将一个对象赋值给另一个对象“，实际上是将”引用“从一个地方复制到另一个地方。即若对对象使用 c=d，那么 c 和 d 都原本只有 d 指向的那个对象。
+Java 中对基本数据类型的赋值是很简单的。基本类型存储了实际的数值，而并非指向一个对象的引用，所以在为其赋值的时候，就是直接将一个地方的内容复制到另一个地方。但是，要注意给对象“赋值”的情况。对一个对象进行操作，真正操作的是对对象的引用，所以”将一个对象赋值给另一个对象“，实际上是将”引用“从一个地方复制到另一个地方。即若对对象使用 **c=d**，那么 **c** 和 **d** 都原本只有 **d** 指向的那个对象。
 
 ```java
 class Tank{
@@ -449,9 +449,9 @@ public class Example32 {
 *///:~
 ```
 
-原本 t1 包含的对对象的引用是指向一个值为 9 的对象。在对 t1 赋值的时候，这个引用被 t2 的引用覆盖，也就是丢失了；然后 t1 和 t2 包含同一个引用，指向相同的对象，所以后面的修改 t1 的同时也改变了 t2。而那个原本的 t1 的引用的对象 9 会由“垃圾回收器”自动清理。
+原本 **t1** 包含的对对象的引用是指向一个值为 9 的对象。在对 **t1** 赋值的时候，这个引用被 **t2** 的引用覆盖，也就是丢失了；然后 **t1** 和 **t2** 包含同一个引用，指向相同的对象，所以后面的修改 **t1** 的同时也改变了 **t2**。而那个原本的 **t1** 的引用的对象 9 会由“垃圾回收器”自动清理。
 
-这种现象被称为“别名现象”，是 Java 操作对象的一种基本方式。在上面的例子中，若想避免这样的现象，可以这样写`t1.level=t2.level`，这样就可以使两个对象彼此独立，而不是将 t1 和 t2 绑定到相同的对象。从现在开始就要留意，为对象赋值可能会产生意想不到的结果。
+这种现象被称为**“别名现象”**，是 Java 操作对象的一种基本方式。在上面的例子中，若想避免这样的现象，可以这样写`t1.level=t2.level`，这样就可以使两个对象彼此独立，而不是将 **t1** 和 **t2** 绑定到相同的对象。从现在开始就要留意，为对象赋值可能会产生意想不到的结果。
 
 #### 3.4.1 方法调用中的别名问题
 
@@ -478,7 +478,7 @@ public class Examole33 {
 *///:~
 ```
 
-在许多其他语言中，方法 f() 似乎要在它的作用域内复制参数 Letter y 的一个副本；但实际上只是传递了一个引用。所以`y.c='z';`实际上改变的是 f() 之外的对象。别名引起的问题及其解决办法是个很复杂的话题，但是现在就应该知道它的存在，并且在使用中注意这个陷阱。
+在许多其他语言中，方法 **f()** 似乎要在它的作用域内复制参数 **Letter y** 的一个副本；但实际上只是传递了一个引用。所以`y.c='z';`实际上改变的是 **f()** 之外的对象。别名引起的问题及其解决办法是个很复杂的话题，但是现在就应该知道它的存在，并且在使用中注意这个陷阱。
 
 ### 3.5 算术操作符
 
@@ -558,3 +558,172 @@ u/=v:9.940527
 
 ```
 
+要生成数字，首先要创建一个 **Random** 类的对象，如果在创建过程中没有传递任何参数，那么 Java 就会将当前的时间作为随机数生成器的种子（用于随机数生成器的初始化值，随机数生成器对于特定的种子值总是产生相同的随机数序列），上面示例通过在创建 **Random** 对象时提供种子，就可以在每次执行程序时生成相同的随机数，因此输出是可以验证的。
+
+通过 **Random** 类对象，程序可以生成许多不同类型的随机数字。需要调用方法 **nextInt()** 和 **nextFloat()** 即可（也可调用 **nextLong()** 或者 **nextDouble()**）。传递给 **nextInt()** 的参数设置了所产生的随机数的上限，而其下限为 0，所以要对结果进行加 1 操作，避免除 0 的可能性。
+
+#### 3.5.1 一元加、减操作符
+
+一元加（+）和一元减（-）与二元加减号使用相同的符号。一元减号用于转变数据的符号，而一元加号只是为了与一元减相对应，它唯一的作用仅仅是将较小类型的操作数提升为 **int**。
+
+### 3.6 自动递增和递减
+
+Java 提供大量快捷运算，使得编码更方便，同时也使得代码更容易阅读，但是有时可能使代码阅读起来更困难。与 C 和 C++ 类似，自增与自减操作符有“前缀式”和“后缀式”两种使用方法。对于前缀式，会先执行运算，再生成值。后缀式与之相反。例子：
+
+```java
+public class Example35 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i=1;
+		System.out.println("i:"+i);
+		System.out.println("++i:"+ ++i);
+		System.out.println("i:"+i);
+		System.out.println("i++:"+ i++);
+		System.out.println("i:"+i);
+		System.out.println("--i:"+ --i);
+		System.out.println("i:"+i);
+		System.out.println("i--:"+ i--);
+		System.out.println("i:"+i);
+	}
+}/*Output
+*i:1
+*++i:2
+*i:2
+*i++:2
+*i:3
+*--i:2
+*i:2
+*i--:2
+*i:1
+*/
+```
+
+### 3.7 关系操作符
+
+关系操作符包括 “<”、“>”、“<=”、“>=”、“==”、“!=”，与 C 和 C++ 类似，生成一个 boolean 结果。“==” 和 “!=” 适用于所有基本类型，而其他比较符不使用与 boolean 类型。
+
+#### 3.7.1 测试对象的等价性
+
+关系操作符 “==” 和 “!=” 也适用于所有对象，但是他们比较的是对象的引用。如果想比较两个对象的实际内容是否相同，必须使用对所有对象都适用的特殊方法 **equals()**，但是这个方法不适用与“基本类型”，基本类型直接使用 “==” 和 “!=”。例：
+
+```java
+public class Example36 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int n1 = 9;
+		int n2 = 9;
+		System.out.println(n1 == n2);
+		System.out.println(n1 != n2);
+		String s1 = new String("abc");
+		String s2 = new String("abc");
+		System.out.println(s1 == s2);
+		System.out.println(s1 != s2);
+		System.out.println(s1.equalsIgnoreCase(s2));
+	}
+}/*Output:
+*true
+*false
+*false
+*true
+*true
+*/
+```
+
+注意：这本书以 JDK5.0 为基~~础而作，书中的例子里`Integer n1 = new Integer(47);` 这种建立 int 型的方法在 JDK9.0 之后就不再支持，Eclipse 会报错。从jdk1.9开始就不建议用Integer构建包了，官方推荐使用ValueOf方法来构建包 ：
+
+~~Integer obj = new Integer(1024);~~ 
+
+Integer obj = Integ-- er.v --alueOf(1024);
+
+但是事情并没有那么简单，假设你自己创建了类：
+
+```java
+class Value{
+	int i;
+}
+public class Example36 {
+	public static void main(String[] args) {
+        Value v1 = new Value();
+		Value v2 = new Value();
+		v1.i=v2.i=10;
+		System.out.println(v1.equals(v2));
+	}
+}/*Output:
+*false
+*/
+```
+
+很费解的是结果又是 false ！！！，这是由于 equals() 的默认行为是比较引用。所以除非在自己的新类中覆盖 equals() 方法，否则不会表现出我们希望的行为。后面会学到覆盖，如何恰当地定义 equals()。但是现在开始需要留意 equals() 的表现方式，会避免一些错误。
+
+### 3.8 逻辑操作符
+
+逻辑操作符：“&&”（与）、“||”（或）、“!"（非），结果是一个 boolean 值。例子：
+
+```java
+import java.util.Random;
+public class Example37 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Random rand = new Random(47);
+		int i = rand.nextInt(100);
+		int j = rand.nextInt(100);
+		System.out.println("i=" + i);
+		System.out.println("j=" + j);
+		// Treating an int as a boolean is not legal Java;
+		// !System.out.println("i && j:"+(i && j));
+		// !System.out.println("i || j:"+(i || j));
+		// !System.out.println("!i:"+(!i));
+		System.out.println("(i<10) && (j<10) is " + ((i < 10) && (j < 10)));
+		System.out.println("(i<10) || (j<10) is " + ((i < 10) || (j < 10)));
+	}
+}/*Output:
+*i=58
+*j=55
+*(i<10) && (j<10) is false
+*(i<10) || (j<10) is false
+*/
+```
+
+逻辑操作符**只可应用于布尔值**，这与 C、C++ 中不同：不能将一个非布尔值当作布尔值在逻辑表达式中使用。代码中用 “//!” 注释掉的语句，就是错误的方法。
+
+#### 3.8.1 短路
+
+使用逻辑操作符时，一旦能够明确无误地确定整个表达式的值，就不再计算表达式余下部分了。这种现象叫做“短路”。所以整个逻辑表达式靠后的部分有可能不会被运算。例子：
+
+```java
+public class Example37 {
+	static boolean test1(int val) {
+		System.out.println("test1(" + val + ")");
+		System.out.println("result:" + (val < 1));
+		return val < 1;
+	}
+
+	static boolean test2(int val) {
+		System.out.println("test2(" + val + ")");
+		System.out.println("result:" + (val < 2));
+		return val < 2;
+	}
+
+	static boolean test3(int val) {
+		System.out.println("test3(" + val + ")");
+		System.out.println("result:" + (val < 3));
+		return val < 3;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		boolean b = test1(0) && test2(2) && test3(2);
+		System.out.println("expression is " + b);
+	}
+}/*
+	 * Output: 
+	 * test1(0)
+	 * result:true
+	 * test2(2)
+	 * result:false
+	 * expression is false
+	 */
+
+```
+
+输出结果显示，第二个测试产生了一个 false 结果，这意味着整个结果肯定是 false，所以没必要计算剩余的式子，不论这个式子后面还有多少个 test，都会直接跳过。这样可以获得潜在的性能提升。
