@@ -727,3 +727,40 @@ public class Example37 {
 ```
 
 输出结果显示，第二个测试产生了一个 false 结果，这意味着整个结果肯定是 false，所以没必要计算剩余的式子，不论这个式子后面还有多少个 test，都会直接跳过。这样可以获得潜在的性能提升。
+
+### 3.9 直接常量
+
+如果在程序里使用了“直接常量”，编译器可以准确的知道要生成什么样的类型，但有时候却是模棱两可。如果发生这样的情况，必须对编译器加以适当的“指导”，用与直接量相关的某些字符来额外增加一些信息。
+
+（此处直接常量的意思，个人认为是用十六进制表示）
+
+例子：
+
+```java
+public class Example38 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i1 = 0x2f;// Hexadecimal(lowercase)
+		System.out.println("i1:" + i1);
+		System.out.println("i1:" + Integer.toBinaryString(i1));// toBinaryString 返回无符号二进制整数
+		int i2 = 0X2F;// Hexadecimal(uppercase)
+		System.out.println("i2:" + Integer.toBinaryString(i2));
+		int i3 = 0177;// Octal (leading zero)
+		System.out.println("i3:" + i3);
+		System.out.println("i3:" + Integer.toBinaryString(i3));
+		char c = 0xffff; // max char hex value
+		System.out.println("c:" + c);
+		System.out.println("c:" + Integer.toBinaryString(c));
+	}
+}/*
+	 * Output: 
+	 * i1:47 
+	 * i1:101111 
+	 * i2:101111 
+	 * i3:127 
+	 * i3:1111111 
+	 * c:￿ 
+	 * c:1111111111111111
+	 */
+```
+
