@@ -726,11 +726,11 @@ public class Example37 {
 
 ```
 
-输出结果显示，第二个测试产生了一个 false 结果，这意味着整个结果肯定是 false，所以没必要计算剩余的式子，不论这个式子后面还有多少个 test，都会直接跳过。这样可以获得潜在的性能提升。
+输出结果显示，第二个测试产生了一个 **false** 结果，这意味着整个结果肯定是 **false**，所以没必要计算剩余的式子，不论这个式子后面还有多少个 test，都会直接跳过。这样可以获得潜在的性能提升。
 
 ### 3.9 直接常量
 
-如果在程序里使用了“直接常量”，编译器可以准确的知道要生成什么样的类型，但有时候却是模棱两可。如果发生这样的情况，必须对编译器加以适当的“指导”，用与直接量相关的某些字符来额外增加一些信息。
+如果在程序里使用了**“直接常量”**，编译器可以准确的知道要生成什么样的类型，但有时候却是模棱两可。如果发生这样的情况，必须对编译器加以适当的“指导”，用与直接量相关的某些字符来额外增加一些信息。
 
 （此处直接常量的意思，个人认为是用十六进制表示）
 
@@ -763,4 +763,254 @@ public class Example38 {
 	 * c:1111111111111111
 	 */
 ```
+
+C 、C++ 或者 Java 中二进制数没有直接常量表示方法。但是在使用十六进制和八进制时，以二进制形式显示结果将非常有用。通过使用 **Integer** 和 **Long** 类的静态方法 **toBinaryString()** 可以很容易实现二进制表示。
+
+#### 3.9.1 指数记数法
+
+Java 采用很不直观的记数法来表示指数，例子：
+
+```java
+public class Example39 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		float expFloat = 1.39e-43f;
+		System.out.println(expFloat);
+		double expDouble = 47e47d;
+		System.out.println(expDouble);
+		double expDouble2 = 47e47;
+		System.out.println(expDouble2);
+	}
+}/*
+	 * Output: 
+	 * 1.39E-43 
+	 * 4.7E48 
+	 * 4.7E48
+	 */
+```
+
+在科学与工程领域，**“e”** 代表自然对数的基数，约等于 2.718。在 FORTRAN 语言中，**“e”** 代表 “10的幂次”，所以在 C、C++、Java中被保留下来。如果编译器能过正确地识别类型，就不必在数值后附加字符。而对于`float f4 = 1e-43f`，编译器通常会将指数作为双精度数处理，所以假如没有这个尾随的 **f**，就会收到一条出错提示，告诉我们必须使用类型装换将 **double** 转换成 **float**。
+
+### 3.10 按位操作符
+
+按位操作符用来操作整数基本数据类型中的单个“比特”（bit），即二进制位，对两个参数中对应的位执行布尔运算，生成结果。
+
+按位操作符和逻辑操作符都使用相同的符号，仅添加一个亦或操作符 “^” ，由于位是非常“小”的，所以按位操作符仅使用一个字符。
+
+按位操作符可以与等号联合使用，以便合并运算和赋值：&=、|=、^=都是合法的，但是“~”是一元操作符，所以不能与等号联用。
+
+### 3.11 移位操作符
+
+移位操作符的运算对象也是二进制的“位”，有左移位操作符（<<）、有符号右移位操作符（>>）和无符号右移位操作符（>>>）。左移位操作符按操作符右侧指定位数将操作符左边操作数向左移位（低位补0）；有符号右移位操作符按照操作符右侧指定位数将操作符左边的操作数向右移动，在移动时使用“符号扩展”，若符号为正，在高位插入0，符号为负，高位插入1；无符号右移位操作符在移位操作时使用“零扩展”，无论正负，高位都插入0，这是 C 或 C++ 中没有的。
+
+如果对 char、byte 等类型的数值进行移位处理，在移位之前，会被转换为 int 类型，并且得到一个 int 类型的值。
+
+移位可以和等号组合使用（<<=、>>=等），此时操作符左边的值会移动由右边的值指定的位数，再将得到的结果赋值给左边的变量。
+
+例子：
+
+```java
+public class Example310 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i = -1;
+		System.out.println(Integer.toBinaryString(i));
+		i >>>= 10;
+		System.out.println(Integer.toBinaryString(i));
+		long l = -1;
+		System.out.println(Long.toBinaryString(l));
+		l >>>= 10;
+		System.out.println(Long.toBinaryString(l));
+		short s = -1;
+		System.out.println(Integer.toBinaryString(s));
+		s >>>= 10;
+		System.out.println(Integer.toBinaryString(s));
+	}
+}/*
+	 * Output: 
+	 * 11111111111111111111111111111111 
+	 * 1111111111111111111111
+	 * 1111111111111111111111111111111111111111111111111111111111111111
+	 * 111111111111111111111111111111111111111111111111111111
+	 * 11111111111111111111111111111111 
+	 * 11111111111111111111111111111111
+	 */
+```
+
+下面的例子展示了如何应用涉及“按位”操作的所有操作符：
+
+```java
+public class Example310 {
+
+	public static void main(String[] args) {
+        Random rand = new Random(47);
+		int i = rand.nextInt();
+		int j = rand.nextInt();
+		System.out.println("-1:" + Integer.toBinaryString(-1));
+		System.out.println("+1:" + Integer.toBinaryString(1));
+		int maxpos = 2147483647; // int型数上限
+		System.out.println("maxpos:" + Integer.toBinaryString(maxpos));
+		int maxneg = -2147483648;// int型数下线
+		System.out.println("maxneg:" + Integer.toBinaryString(maxneg));
+		System.out.println("i:" + Integer.toBinaryString(i));
+		System.out.println("~i:" + Integer.toBinaryString(~i));
+		System.out.println("-i:" + Integer.toBinaryString(-i));
+		System.out.println("j:" + Integer.toBinaryString(j));
+		System.out.println("i & j:" + Integer.toBinaryString(i & j));
+		System.out.println("i | j:" + Integer.toBinaryString(i | j));
+		System.out.println("i ^ j:" + Integer.toBinaryString(i ^ j));
+		System.out.println("i << 5:" + Integer.toBinaryString(i << 5));
+		System.out.println("i >> 5:" + Integer.toBinaryString(i >> 5));
+		System.out.println("(~i) >> 5:" + Integer.toBinaryString((~i) >> 5));
+		System.out.println("i >>> 5:" + Integer.toBinaryString(i >>> 5));
+		System.out.println("(~i) >>> 5:" + Integer.toBinaryString((~i) >>> 5));
+	}
+}
+/* Output2: 
+ * -1:11111111111111111111111111111111 
+ * +1:1
+ * maxpos:1111111111111111111111111111111
+ * maxneg:10000000000000000000000000000000 
+ * i:-1172028779
+ *  i:10111010001001000100001010010101
+ * ~i:1000101110110111011110101101010 
+ * -i:1000101110110111011110101101011
+ * j:1717241110
+ * j:1100110010110110000010100010110 
+ * i & j:100010000000000000000000010100 
+ * i | j:11111110011111110100011110010111 
+ * i ^ j:11011100011111110100011110000011 
+ * i << 5:1000100100010000101001010100000 
+ * i >> 5:11111101110100010010001000010100
+ * (~i) >> 5:10001011101101110111101011 
+ * i >>> 5:101110100010010001000010100 
+ * (~i) >>> 5:10001011101101110111101011
+ */
+```
+
+long 类型数据也可像上面一样操作。
+
+### 3.12 三元操作符&if-else
+
+三元操作符（条件操作符），很特别：唯一一个三元操作符，且最终会生成一个值，与普通 if-else 语句不同。表达式：`boolean-exp ? value0 : value1`，与 C 和 C++一样，当然也可以换用普通 if-else 语句，但是三元操作符更加简洁。假如打算频繁使用它，要慎重考虑，因为很容易产生可读性极差的代码。下面是比较三元操作符和 if-else 比较的例子：
+
+```java
+public class Example311 {
+	static int ternary(int i) {
+		return i < 10 ? i * 100 : i * 10;
+	}
+	// 如果编写方法，建议使用三元操作符，根据代码规范，函数有两个出口是不合格的！！！
+	static int standardIfElse(int i) {
+		if (i < 10)
+			return i * 100;
+		else
+			return i * 10;
+	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println(ternary(9));
+		System.out.println(ternary(10));
+		System.out.println(standardIfElse(9));
+		System.out.println(standardIfElse(10));
+	}
+}/*
+	 * Output: 
+	 * 900 
+	 * 100 
+	 * 900 
+	 * 100
+	 */
+```
+
+### 3.13 字符串操作符 + 和 +=
+
+“+” 这个操作符在 Java 中有特殊的用途：连接不同的字符串。字符串操作符有一些很有趣的行为。如果表达式以一个字符串起头，那么后续所有操作数都必须是字符串型。
+
+```java
+public class Example312 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int x = 0, y = 1, z = 2;
+		String s = "x, y, z ";
+		System.out.println(s + x + y + z);
+		System.out.println(x + "" + s);
+		s += "summed = ";
+		System.out.println("" + x);
+	}
+}/*
+	 * Output: x, y, z 012 
+	 * 0x, y, z 
+	 * 0
+	 */
+```
+
+### 3.14 使用操作符时常犯的错误
+
+### 3.15 类型转换操作符
+
+类型转换（cast）的原意是“模型铸造”。类型转换运算允许显式地进行类型转换，或者在不能自动进行转换的时候强制进行类型转换。例子：
+
+```java
+public class Exmaple313 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i = 200;
+		long lng = (long) i;
+		System.out.println(lng);
+		long lng2 = 200;
+		i = (int) lng2;
+		System.out.println(i);
+	}
+}/*
+	 * Output: 
+	 * 200 
+	 * 200
+	 */
+```
+
+在 C 和 C++ 中，类型转换有时会让人头痛，但是在 Java 中，类型转换是一种比较安全的操作。类型转换分为两种——窄化转换（narrowing conversion）和扩展转换（widening conversion）。执行窄化转换时（即将能容纳更多信息的数据类型转换为无法容纳那么多信息的类型），会面临信息丢失的危险，此时编译器会强制程序员进行类型转换。执行扩展转换则不需要显式类型转换。
+
+Java 允许将任何基本数据类型转换成别的基本数据类型，布尔类型除外。
+
+#### 3.15.1 截尾和舍入
+
+在执行窄化转换时，必须注意截尾和舍入的问题。例子：
+
+```java
+public class Example314 {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		double above = 0.7, below = 0.4;
+		float fabove = 0.7f, fbelow = 0.4f;
+		System.out.println("(int)above:" + (int) above);
+		System.out.println("(int)below:" + (int) below);
+		System.out.println("(int)fabove:" + (int) fabove);
+		System.out.println("(int)fbelow:" + (int) fbelow);
+		System.out.println("Math.round(above):" + Math.round(above));
+		System.out.println("Math.round(below):" + Math.round(below));
+		System.out.println("Math.round(fabove):" + Math.round(fabove));
+		System.out.println("Math.round(fbelow):" + Math.round(fbelow));
+	}
+}/*
+	 * Output: 
+	 * (int)above:0 
+	 * (int)below:0 
+	 * (int)fabove:0 
+	 * (int)fbelow:0
+	 * Math.round(above):1 
+	 * Math.round(below):0 
+	 * Math.round(fabove):1
+	 * Math.round(fbelow):0
+	 */
+```
+
+可以看出， **float** 或者 **double** 类型转为整型时，会将数字执行截尾操作。如果要得到舍入的结果，需使用 **java.lang.Math** 中的 **round()** 方法。
+
+### 3.16 Java 没有 sizeof
+
+在 C 和 C++ 中，sizeof() 操作符可以告诉你为数据项分配的字节数。在 C 和 C++ 中，需要使用 sizeof() 的原因最大的原意是为了“移植”。Java 不需要 sizeof() 的原因是所有数据类型在所有机器中大小是相同的。
+
+## 第四章 控制执行流程
+
+**就像有知觉的生物一样，程序必须在执行过程中控制它的世界，并做出选择。在 Java 中，你要使用执行控制语句来做出选择。**
 
