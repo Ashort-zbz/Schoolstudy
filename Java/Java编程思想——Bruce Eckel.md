@@ -1014,3 +1014,105 @@ public class Example314 {
 
 **就像有知觉的生物一样，程序必须在执行过程中控制它的世界，并做出选择。在 Java 中，你要使用执行控制语句来做出选择。**
 
+Java 中使用所有 C 语言中的流程控制语言，所以在此仅简单介绍。
+
+### 4.1 true & false
+
+注意 Java 不允许我们将一个数字作为布尔值使用，但这在 C 和 C++ 中是允许的（“真”是非零，“假”是零）。
+
+### 4.2 if-else
+
+该语句是控制程序流程最基本的形式，其中 else 是可选的。例子：
+
+```java
+public class Example401 {
+	static int result = 0;
+
+	static void test(int testval, int target) {
+		if (testval > target)
+			result = +1;
+		else if (testval < target)
+			result = -1;
+		else
+			result = 0;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		test(10, 5);
+		System.out.println(result);
+		test(5, 10);
+		System.out.println(result);
+		test(5, 5);
+		System.out.println(result);
+	}
+}/*
+	 * Output: 
+	 * 1 
+	 * -1 
+	 * 0
+	 */
+```
+
+### 4.3 迭代
+
+**while**、**do-while** 和 **for** 用来控制循环。
+
+```java
+//while
+public class Example402 {
+	static boolean condition() {
+		boolean result = Math.random() < 0.99;
+		System.out.println(result + ",");
+		return result;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		while (condition())
+			System.out.println("Inside 'while'");
+		System.out.println("Exited 'while'");
+	}
+}/*
+	 * Output: (Execute to see output)
+	 */
+```
+
+```java
+//for
+public class Example403 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for(char c = 0; c < 128; c++){
+            int i = (int)c;
+            if(Character.isLowerCase(c));{
+                System.out.println("value:" + i + "character:" + c);
+            }
+        }
+	}
+
+}
+```
+
+
+
+### 4.4 foreach 语法
+
+该语法和 python 的 foreach 相似。
+
+### 4.5 return
+
+return 关键词有两方面用途：一方面指定一个方法返回什么值，另一方面会导致当前的方法退出，并且返回那个值。
+
+### 4.6 break 和 continue
+
+任何迭代语句的主体部分，都可用 break 和 continue 控制循环的流程。其中，break 用于强行退出循环，不执行剩余语句。而continue 则停止当前迭代，然后退回循环起始处，开始下一次迭代。
+
+### 4.7 switch
+
+switch 有时也被规划为一种选择语句，是实现多路选择的一种干净利落的方法。
+
+## 第五章 初始化与清理
+
+**随着计算机革命的发展。“不安全”的编程方式已逐渐成为编程代价高昂的主要原因之一。**
