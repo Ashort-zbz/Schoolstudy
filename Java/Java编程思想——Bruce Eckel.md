@@ -1115,4 +1115,122 @@ switch 有时也被规划为一种选择语句，是实现多路选择的一种�
 
 ## 第五章 初始化与清理
 
-**随着计算机革命的发展。“不安全”的编程方式已逐渐成为编程代价高昂的主要原因之一。**
+**随着计算机革命的发展。“不安全”的编程方式已逐渐成为编程代价高昂的主要原因之一。**初始化和清理正是涉及安全的两个问题。C++ 引入了构造器（constructor）概念，这是一个在创建对象时被自动调用的特殊方法。Java 中也采用了构造器，并额外提供了“垃圾回收器”。对于不再使用的内存资源，垃圾回收器能自动将其释放。
+
+### 5.1 用构造器确保初始化
+
+在 Java 中，通过提供构造器，类的设计者可以确保每个对象都会得到初始化。创建对象时，如果类具有构造器，Java 就会在用户有能力操作对象之前自动调用相应的构造器，从而保证初始化的进行。
+
+如何命名构造器？构造器采用与类相同的名称。例子：
+
+```java
+public class Example501 {
+	Example501() {// This is the constructor
+		System.out.println("Rock");
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < 10; i++) {
+			new Example501();
+		}
+	}
+}/*
+	 * Output: Rock Rock Rock Rock Rock Rock Rock Rock Rock Rock
+	 */
+```
+
+注意，由于构造器名称必须与类名完全相同，所以“每个方法首字母小写”的编码风格在此不适用。
+
+不接受任何参数的构造器叫做默认构造器，Java 文档中通常用术语无参构造器。和其他方法一样，构造器也能带有形式参数，以便指定如何创建对象。将上面例子稍加改写：
+
+```java
+public class Example501 {
+	Example501(int i) {// This is the constructor
+		System.out.println("Rock" + i);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < 10; i++) {
+			new Example501(i);
+		}
+	}
+}/*
+	 * Output: Rock0 Rock1 Rock2 Rock3 Rock4 Rock5 Rock6 Rock7 Rock8 Rock9
+	 * 
+	 */
+```
+
+有了构造器参数，就可以在初始化对象时提供实际参数。构造器有助于减少错误，并使代码更易阅读。在 Java 中，“初始化”和创建捆绑在一起，两者不分离。
+
+构造器是一种特殊类型的方法，因为它没有返回值。
+
+### 5.2 方法重载
+
+任何程序设计语言都具备一项重要特性就是对名字的运用。当创建一个对象时，也就给此对象分配到的存储空间取了个名字。
+
+在 Java 里，构造器是强制重载方法名的另一个原因。假如要创建一个类，其有两种构造器：一个是默认构造器，另一个取字符串作为形参。由于都是构造器，所以它们必须有相同的名字，即类名。为了让方法名和相同而形参不同的构造器同时存在，必须用到方法重载。尽管方法重载是构造器说必需的，但它亦可以用于其他方法，且用法同样方便。例子：
+
+```java
+public class Example502 {
+	int height;
+
+	Example502() {
+		System.out.println("Planting a seeding");
+		height = 0;
+	}
+
+	Example502(int i) {
+		height = i;
+		System.out.println("Creating new Tree that is " + height + "feet tall");
+	}
+
+	void info() {
+		System.out.println("Tree is " + height + "feet tall");
+	}
+
+	void info(String s) {
+		System.out.println(s + ": Tree is " + height + " feet tall");
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < 5; i++) {
+			Example502 t = new Example502(i);
+			t.info();
+			t.info("overloaded method");
+		}
+		System.out.println();
+		new Example502();
+	}
+}/*
+	 * Output:
+	 * Creating new Tree that is 0feet tall 
+	 * Tree is 0feet tall 
+	 * overloaded method: Tree is 0 feet tall 
+	 * Creating new Tree that is 1feet tall 
+	 * Tree is 1feet tall 
+	 * overloaded method: Tree is 1 feet tall 
+	 * Creating new Tree that is 2feet tall 
+	 * Tree is 2feet tall 
+	 * overloaded method: Tree is 2 feet tall 
+	 * Creating new Tree that is 3feet tall 
+	 * Tree is 3feet tall 
+	 * overloaded method: Tree is 3 feet tall 
+	 * Creating new Tree that is 4feet tall 
+	 * Tree is 4feet tall 
+	 * overloaded method: Tree is 4 feet tall
+	 * 
+	 * Planting a seeding
+	 */
+
+```
+
+#### 5.2.1 区分重载方法
+
+区分规则：每个重载的方法都必须有一个独一无二的参数类型列表。甚至参数顺序不同也可以区分两个方法，但是一般情况下别这么做，会使代码难以维护。
+
+### 5.3 默认构造器
+
+默认构造器（又称“无参”构造器）是没有形参的。它的作用是创建一个“默认对象”，如果类中没有构造器，编译器会自动创建一个默认构造器。
