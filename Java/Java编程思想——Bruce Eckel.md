@@ -1236,3 +1236,616 @@ public class Example502 {
 ### 5.3 默认构造器
 
 默认构造器（又称“无参”构造器）是没有形参的。它的作用是创建一个“默认对象”，如果类中没有构造器，编译器会自动创建一个默认构造器。
+
+### 5.4 this 关键字
+
+假设希望在方法的内部获得对当前对象的引用。由于这个引用是由编译器“偷偷”传入的，所以没有标识符可用。但是为此有个专门的关键字：this。this 关键字只能在方法内部使用，表示对“调用方法的那个对象”的引用。this 用法和其他对象引用并无不同。但如果在方法内部调用同一个类的另一个方法，就不必使用 this，直接调用即可。例子：
+
+```java
+class Person{
+	public void eat(Apple apple) {
+		Apple peeled = apple.getPeeled();
+		System.out.println("Yummy");
+	}
+}
+
+class Peeler{
+	static Apple peel(Apple apple) {
+		//...
+		return apple;
+	}
+}
+
+class Apple{
+	Apple getPeeled() {
+		return Peeler.peel(this);
+	}
+}
+public class Example503 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new Person().eat(new Apple());
+	}
+}
+```
+
+Apple 需要调用 Peeler.peel() 方法，是一个外部的工具方法，将执行由于某种原因而必须放在 Apple 外部的操作。为了将其自身传递给外部方法，Apple 必须使用 this 关键字。
+
+#### 5.4.1 在构造器中调用构造器
+
+可能为一个类写了多个构造器，有时可能想在一个构造器中调用另一个构造器，以避免重复代码。可用 this 关键字做到这一点。通常写 this 时，都是指“这个对象”或者“当前对象”，而且它本身表示对当前对象的引用。在构造器中，如果为 this 添加了参数列表，那么就有了不同的含义。这将产生对符合此参数列表的某个构造器的明确调用；这样，调用其他构造器就有了直接的途径。例子：
+
+```java
+public class Example504 {
+	int petalCount = 0;
+	String s = "initial value";
+
+	Example504(int petals) {
+		petalCount = petals;
+		System.out.println("Constructor w/ int arg only, petalCount= " + petalCount);
+	}
+
+	Example504(String ss) {
+		System.out.println("Constructor w/ String arg only, s = " + ss);
+		s = ss;
+	}
+
+	Example504(String s, int petals) {
+		this(petals);
+		// ! this(s); //Can't call two!
+		this.s = s; // Another use of "this"
+		System.out.println("String & int args");
+	}
+
+	Example504() {
+		this("hi", 47);
+		System.out.println("petalCount = " + petalCount + " s = " + s);
+	}
+
+	void printPetalCount() {
+		// ! this(11); //not inside non-constructor!
+		System.out.println("petalCount = " + petalCount + " s = " + s);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Example504 x = new Example504();
+		x.printPetalCount();
+	}
+}/*
+	 * Output: 
+	 * Constructor w/ int arg only, petalCount= 47 
+	 * String & int args
+	 * petalCount = 47 s = hi 
+	 * petalCount = 47 s = hi
+	 * 
+	 */
+```
+
+构造器 Example504(String s,int petals) 表明，尽管可以用 this 调用一个构造器，但不恩调用两个。此外，必须将构造器调用置于最起始处，否则编译器会报错。
+
+例子也展示了 this 的另一种用法。由于参数 s 的名称和数据成员 s 的名字相同，所以会产生歧义。使用 this.s 代表数据成员就能解决这个问题。在 Java 代码中经常出现这种写法。
+
+#### 5.4.2 static 的含义
+
+static 方法就是没有 this 的方法。在 static 方法的内部不能调用非静态方法，反过来倒是可以。而且可以在没有创建任何对象的前提下，仅仅通过类本身来调用 static 方法。这实际上正是 static 方法的主要用途。很像全局方法。
+
+### 5.5 清理：终结处理和垃圾回收
+
+程序员都了解初始化的重要性，但**清理**工作也同样重要。在使用程序库时，把一个对象用完之后就“弃之不顾”的做法**并非总是安全**。Java 有垃圾回收器负责回收无用对象占据的内存资源。但也有**特殊情况**：由于垃圾回收器只知道释放那些经由 new 分配的内存，如果你的对象不是通过 new 申请的内存空间，垃圾回收器就不会释放这个对象的内存。
+
+为了应对这样的情况，Java 允许在类中定义一个名为 **finalize()** 的方法。他的工作原理**“假定”**是这样：一旦垃圾回收器准备释放对象占用的存储空间，将首先调用其 **finalize()** 方法，并且在下次垃圾回收时，才会真正回收对象占用的内存。所以如果打算用 **finalize()** 方法，就能在垃圾回收时刻做一些重要的清理工作。
+
+这里有一个潜在的陷阱，有人会把 **finalize()** 方法当作 C++ 中的**析构函数**（C++ 销毁对象时必须用到这个函数）。有必要明确区分一下：在 C++ 中，对象一定会被销毁；而 Java 里的对象并非总是被垃圾回收。换句话说：
+
+> 1、对象可能不被垃圾回收。
+>
+> 2、垃圾回收并不等于“析构”
+
+这意味着不需要某个对象之前，如果必须执行某些动作，得自己动手去做。Java 并未提供“析构函数”或相似概念，要做类似的清理工作，必须自己动手创建一个执行清理工作的普通方法。
+
+如果程序执行结束，且垃圾回收器一直都没有释放创建的任何对象的存储空间，那么随着程序的退出，那些资源也会全部交还给操作系统。
+
+#### *5.5.1 finalize()用途
+
+> 3、垃圾回收只与内存有关
+
+即使用垃圾回收器的唯一原因是为了回收程序不再使用的内存。所以对于垃圾回收的任何行为（尤其是 **finalize()** 方法），它们也必须**同内存及其回收有关**。
+
+但这并不意味着对象中含有其他对象，finalize() 就应该明确释放这些对象，无论对象如何创建，垃圾回收器都会负责释放对象占据的所有内存。这将对 finalize() 的需求限制到一种特殊情况，即**通过某种创建对象方式以外的方式为对象分配了存储空间**。
+
+之所以要有 finalize() ，是由于在分配内存时可能采用了**类似 C 语言中的做法**。而非 Java 代码方式。本地方法目前支持 C 和 C++，但它们可以调用其他语言写的代码。在非 Java 代码中，也许会调用 C 的 **malloc()** 函数来分配存储空间，除非调用 **free()**  函数，否则存储空间将得不到释放，从而造成内存泄露。**free()** 是 C 和 C++ 中的函数，所以需要在 **finalize()** 中用本地方法调用它。 
+
+#### *5.5.2 必须实施清理
+
+Java 不允许创建局部对象，必须使用 **new** 创建。在 Java 中，也没有 C++ 中用于释放对象的 **delete**，因为垃圾回收器会帮助你释放存储空间。**甚至可以肤浅的认为：就是由于垃圾回收机制的存在，使得 Java 没有析构函数。**但是，垃圾回收器并不能完全替代析构函数。如果希望进行除释放空间之外的清理工作，还是得明确调用某个恰当的 Java 方法，这就等同于使用了析构函数，但是没有在 C++ 中方便。
+
+**记住，无论是“垃圾回收”还是“终结”，都不保证会一定发生。**如果 Java 虚拟机并未面临内存耗尽的情况，是不会浪费时间去执行垃圾回收以恢复内存的。
+
+#### *5.5.3 终结条件
+
+通常不能指望 **finalize()** ，必须创建其他的“清理”方法，并且明确调用他们，**finalize()** 只能存在于程序员很难用到的一些晦涩用法里。但是，**finalize()** 还有一个有趣的用法，它并不依赖于每次都要对 **finalize()** 进行调用，这就是对象**终结条件**的验证。
+
+当对某个对象不再感兴趣，即可以被清理了，这个对象应该处于某种状态，使它，使得它占用的内存可以被安全地释放。**只要对象中存在没有被适当清理的部分，程序就存在很隐晦的缺陷。** finalize() 可以用来最终发现这种缺陷情况。例子：
+
+```java
+class Book {
+	boolean checkedOut = false;
+
+	Book(boolean checkOut) {
+		checkedOut = checkOut;
+	}
+
+	void checkIn() {
+		checkedOut = false;
+	}
+
+	protected void finalize() {
+		if (checkedOut) {
+			System.out.println("Error: checked out");
+			// Normally, you'll also do this:
+			// super.finalize(); //Call the base-class version
+		}
+	}
+}
+
+public class Example505 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Book novel = new Book(true);
+		// Proper cleanup
+		novel.checkIn();
+		// Drop the reference, forget to clean up;
+		new Book(true);
+		// Force garbage collection & finalization
+		System.gc();
+	}
+
+}/*
+	 * Output: Error: checked out
+	 */
+
+```
+
+上面例子的终结条件是：所有 **Book** 对象在被当做垃圾回收前都应该被签入（**check in**)。但是在 **main()** 方法中，由于程序员的错误，有一本书未被签入。要是没有 **finalize()** 来验证终结条件，则很难发现这种错误。
+
+上面例子中 `System.gc()` 就是在 Java 虚拟机中运行垃圾收集器。
+
+#### *5.5.4 垃圾回收器如何工作
+
+在原来的程序语言中，在堆上分配对象的代价很高。但是 Java 中，**垃圾回收器对于提高对象的创建速度，有明显的效果**。或许或有点奇怪：存储空间的释放竟然会影响存储空间的分配。但这就是 JVM 的工作方式。也就是说，**Java 从堆分配空间的速度，可以和其他语言从堆栈分配空间的速度向媲美**。
+
+（没写完）
+
+### 5.6 成员初始化
+
+Java 尽力保证：所有变量在使用之前都能得到初始化。对于方法的局部变量，Java 以编译时错误的形式来贯彻这种保证。如果类成员都是基本类型，情况还会有所不同，类的每个基本类型成员保证都会有一个初始值，例子：
+
+```java
+public class Example506 {
+	boolean t;
+	char c;
+	byte b;
+	short s;
+	int i;
+	long l;
+	float f;
+	double d;
+	Example506 reference;
+
+	void printInitialValues() {
+		System.out.println("Data type    Initial value");
+		System.out.println("boolean      " + t);
+		System.out.println("char         " + c);
+		System.out.println("byte         " + b);
+		System.out.println("short        " + s);
+		System.out.println("int          " + i);
+		System.out.println("long         " + l);
+		System.out.println("float        " + f);
+		System.out.println("double       " + d);
+		System.out.println("reference    " + reference);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Example506 vi = new Example506();
+		vi.printInitialValues();
+	}
+
+}/*
+	 * Output: 
+	 *Data type    Initial value
+	 *boolean      false
+	 *char         
+	 *byte         0
+	 *short        0
+	 *int          0
+	 *long         0
+	 *float        0.0
+	 *double       0.0
+	 *reference    null
+	 */
+
+```
+
+可见，虽然类成员初始值未给出，但是它们确实有初值（**char** 值为0，所以显示为空白）在类中定义一个对象引用时，如果不将其初始化，该引用就会获得一个 **null**。
+
+#### 5.6.1 指定初始化
+
+有一种给某个变量赋初值的直接方法：在定义成员变量的地方为其赋值（C++ 中不能这样做），对于对象可以用同样的方法。例子：
+
+```java
+class Depth{
+    
+}
+public class Measurement{
+    Depth d = new Depth();
+    //...
+}
+```
+
+如果没有给 **d** 指定初始值就尝试使用，就会出现运行时错误，告诉你产生了一个**异常**。
+
+这种初始化的方式既简单又直观，但是却有**限制**：所有对象的初始值都一样。有时需要更大的**灵活性**。
+
+### 5.7 构造器初始化
+
+可以用构造器来初始化。但是要**注意**：无法阻止自动初始化的进行，它将在构造器调用之前发生。
+
+#### 5.7.1 初始化顺序
+
+在类内部，变量定义的先后顺序决定了初始化的顺序。即使变量散布在方法定义之间，它们仍旧会在任何方法被调用之前得到初始化。例子：
+
+```java
+class Window {
+	Window(int marker) {
+		System.out.println("Window(" + marker + ")");
+	}
+}
+
+class House {
+	Window w1 = new Window(1); // Before constructor
+
+	House() {
+		// show that we're in the constructor
+		System.out.println("House()");
+		w3 = new Window(33);
+	}
+
+	Window w2 = new Window(2);
+
+	void f() {
+		System.out.println("f()");
+	}
+
+	Window w3 = new Window(3);
+}
+
+public class Example507 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		House h = new House();
+		h.f();
+	}
+
+}/*
+	 * Output: 
+	 * Window(1) 
+	 * Window(2) 
+	 * Window(3) 
+	 * House() 
+	 * Window(33) 
+	 * f()
+	 */
+```
+
+在 **House** 类中，故意把几个 **Window** 对象的定义分散在各处，以证明它们全都会在调用构造器或其他方法之前得到初始化。
+
+#### 5.7.2 静态数据的初始化
+
+无论创建多少对象，静态数据都只占用一份存储区域。**static** 关键字不能应用于局部变量，因此它只能作用于域。如果一个域是静态的基本类型，且没有对它初始化，那么它就会获得基本类型的标准初值；如果是一个对象引用，那么默认初始化值就是 **null**。
+
+那么静态存储区域是什么时候初始化的？例子：
+
+```java
+class Bowl {
+	Bowl(int marker) {
+		System.out.println("Bowl(" + marker + ")");
+	}
+
+	void f1(int marker) {
+		System.out.println("f1(" + marker + ")");
+	}
+}
+
+class Table {
+	static Bowl bowl1 = new Bowl(1);
+
+	Table() {
+		System.out.println("Table()");
+		bowl2.f1(1);
+	}
+
+	void f2(int marker) {
+		System.out.println("f2(" + marker + ")");
+	}
+
+	static Bowl bowl2 = new Bowl(2);
+}
+
+class Cupboard {
+	Bowl bowl3 = new Bowl(3);
+	static Bowl bowl4 = new Bowl(4);
+
+	Cupboard() {
+		System.out.println("Cupboard()");
+		bowl4.f1(2);
+	}
+
+	void f3(int marker) {
+		System.out.println("f3(" + marker + ")");
+	}
+
+	static Bowl bowl5 = new Bowl(5);
+}
+
+public class Example508 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("Creating new Cupboard() in main");
+		new Cupboard();
+		System.out.println("Creating new Cupboard() in main");
+		new Cupboard();
+		table.f2(1);
+		cupboard.f3(1);
+	}
+
+	static Table table = new Table();
+	static Cupboard cupboard = new Cupboard();
+}/*
+	 * Output: 
+	 * Bowl(1) 
+	 * Bowl(2) 
+	 * Table() 
+	 * f1(1) 
+	 * Bowl(4) 
+	 * Bowl(5) 
+	 * Bowl(3) 
+	 * Cupboard()
+	 * f1(2) 
+	 * Creating new Cupboard() in main 
+	 * Bowl(3) 
+	 * Cupboard() 
+	 * f1(2) 
+	 * Creating new Cupboard() in main 
+	 * Bowl(3) 
+	 * Cupboard() 
+	 * f1(2) 
+	 * f2(1) 
+	 * f3(1)
+	 */
+```
+
+由输出可见，静态初始化只有在必要时才会进行。如果不创建 Table 对象，也不引用 Table.b1 或 Table.b2，那么静态的 Bowl b1 和 b2 永远都不会被创建。只有在第一个 Table 对象被创建的时候，他们才会被初始化。此后，静态对象不会再次被初始化。
+
+初始化的顺序是先静态对象，然后是“非静态”对象。要执行 main 方法，必须加载 Example508 类，然后其静态域 table 和 cupboard 被初始化，这导致他们对应的类也被加载，由于它们都包含静态 Bowl 对象，所以 Bowl 随后也被加载。所有类在 main() 开始之前就都被加载了。但是实际中，不会将所有对象都通过 static 联系起来。
+
+总结对象创建过程，假设有个名为 **Dog** 的类：
+
+1. 即使没有显式地使用 **static** 关键字，构造器实际上也是静态方法。所以，当首次创建类型为 **Dog** 的对象时，或者 **Dog** 类的静态方法/静态域首次被访问时，Java 解释器必须查找类路径，以定位 **Dog.class** 文件
+2. 然后载入 **Dog.class** ，有关静态初始化的所有动作都会执行。所以静态初始化只在 **Class** 对象首次加载时进行一次。
+3. 当用 **new Dog()** 创建对象时，首先将在堆上为 **Dog** 对象分配足够的存储空间。
+4. 这块存储空间会被清零，这就自动地将 **Dog** 对象中所有基本类型数据都设置成默认值，而引用则被置为 **null**。
+5. 执行所有出现于字段定义处的初始化动作。
+6. 执行构造器。
+
+#### 5.7.3 显式的静态初始化
+
+Java 允许将多个静态初始化动作组织成一个特殊的**“静态子句”**（有时也称作**“静态块”**）。例如：
+
+```java
+public class Spoon{
+    static int i;
+    static{
+        i = 47;
+    }
+}
+```
+
+上面例子实际上是一段跟在 **static** 关键字后面的代码。与其他静态初始化动作一样，代码仅执行一次，当首次生成这个类的一个对象是，或者首次访问属于类的静态数据成员时。例子：
+
+```java
+class Cup {
+	Cup(int marker) {
+		System.out.println("Cup(" + marker + ")");
+	}
+
+	void f(int marker) {
+		System.out.println("f(" + marker + ")");
+	}
+}
+
+class Cups {
+	static Cup cup1;
+	static Cup cup2;
+	static {
+		cup1 = new Cup(1);
+		cup2 = new Cup(2);
+	}
+
+	Cups() {
+		System.out.println("Cups()");
+	}
+}
+
+public class Example509 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("Inside main()");
+		Cups.cup1.f(99);
+	}
+
+}/*
+	 * Output: 
+	 * Inside main() 
+	 * Cup(1) 
+	 * Cup(2) 
+	 * f(99)
+	 */
+
+```
+
+#### 5.7.4 非静态实例初始化
+
+Java 中也有被称为**实例初始化**的语法，用来初始化每个对象的非静态变量。例子：
+
+```java
+class Mug {
+	Mug(int marker) {
+		System.out.println("Mug(" + marker + ")");
+	}
+
+	void f(int marker) {
+		System.out.println("f(" + marker + ")");
+	}
+}
+
+public class Example510 {
+	Mug m1;
+	Mug m2;
+	{
+		m1 = new Mug(1);
+		m2 = new Mug(2);
+		System.out.println("m1 & m2 initialized");
+	}
+
+	Example510() {
+		System.out.println("Mugs");
+	}
+
+	Example510(int i) {
+		System.out.println("Mugs(int)");
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("Inside main()");
+		new Example510();
+		System.out.println("new Mugs() completed");
+		new Example510(1);
+		System.out.println("new Mugs(1) completed");
+	}
+
+}/*
+	 * Output: 
+	 * Inside main() 
+	 * Mug(1) 
+	 * Mug(2) 
+	 * m1 & m2 initialized 
+	 * Mugs 
+	 * new Mugs() completed 
+	 * Mug(1) 
+	 * Mug(2) 
+	 * m1 & m2 initialized 
+	 * Mugs(int) 
+	 * new Mugs(1) completed
+	 */
+
+```
+
+看起来与静态初始化子句一样，只不过少了 **static**。这种语法对于支持**“匿名内部类”**的初始化是必须的，但它也使得你可以保证无论调用哪个显式构造器，某些操作都会发生。
+
+### 5.8 数组初始化
+
+定义一个数组：`int[] a1`或者`int a1[]`，后者更符合 C 和 C++ 的使用习惯，但是，前一种格式更加合理——“**一个 int 型数组**”。
+
+**编译器不允许指定数组大小。**为了给数组创建相应的存储空间，必须写初始化表达式。对弈数组，初始化动作可以出现在代码任何地方，但也可以使用一种特殊的初始化表达方式，它必须在创建数组的地方出现。这种特殊化的初始化由一对花括号括起来的值组成。在这种情况下，存储空间的分配将由编译器负责。例子：
+
+```java
+public class Example511 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int[] a1 = { 1, 2, 3, 4, 5 };
+		int[] a2;
+		a2 = a1;
+		for (int i = 0; i < a2.length; i++) {
+			a2[i] = a2[i] + 1;
+		}
+		for (int i = 0; i < a1.length; i++) {
+			System.out.println("a1[" + i + "]=" + a1[i]);
+		}
+	}
+
+}/*
+	 * Output: 
+	 * a1[0]=2 
+	 * a1[1]=3 
+	 * a1[2]=4 
+	 * a1[3]=5 
+	 * a1[4]=6
+	 */
+```
+
+由于 **a1** 和 **a2** 是相同数组的别名，所以通过 **a2** 所做的修改在 **a1** 中可以看到。
+
+所有数组（无论元素是基本类型还是对象）都有一个固定成员 **length**，可以通过其获知数组内包含多少个元素，但是不能对其修改。Java 数组计数从第 0 个元素开始，所以能使用的最大下标数是 **length-1**。<u>要是超过这个边界，C 和 C++ 会“默默”地接受，并且允许你访问所有的内存。Java 能保护程序免受这一问题的困扰，一旦访问下标过界，就会出现异常。</u>
+
+如果在写程序时，不能确定在数组中需要多少个元素，可以直接使用 new 在数组里创建元素。例子：
+
+```java
+import java.util.*;
+
+public class Example512 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int[] a;
+		Random rand = new Random(47);
+		a = new int[rand.nextInt(20)];
+		System.out.println("length of a = " + a.length);
+		System.out.println(Arrays.toString(a));
+	}
+
+}/*
+	 * Output: 
+	 * length of a = 18 
+	 * [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	 */
+```
+
+上面例子说明：数组元素中的基本数据类型会自动初始化成空值。Arrays.toString() 方法属于 java.util 标准类库，用来产生一维数组可打印版本。当然上面的数组也可以在定义的同时进行初始化：`int[] a = new int[rand.nextInt(20)];`。如果可能的话，尽可能这么做。
+
+如果创建的是一个非基本类型的数组，那么你就创建了一个引用数组。以整型包装器类 Integer 为例：
+
+```java
+import java.util.*;
+
+public class Example513 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Random rand = new Random(47);
+		Integer[] a = new Integer[rand.nextInt(20)];
+		System.out.println("length of a = " + a.length);
+		System.out.println(Arrays.toString(a));
+		for (int i = 0; i < a.length; i++) {
+			a[i] = rand.nextInt(500);
+		}
+		System.out.println(Arrays.toString(a));
+	}
+
+}/*
+	 * Output: 
+	 * length of a = 18 
+	 * [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null] 
+	 * [55, 193, 361, 461, 429, 368, 200, 22, 207, 288, 128, 51, 89, 309, 278, 498, 361, 20]
+	 */
+
+```
+
