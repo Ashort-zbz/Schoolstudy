@@ -1819,9 +1819,9 @@ public class Example512 {
 	 */
 ```
 
-上面例子说明：数组元素中的基本数据类型会自动初始化成空值。Arrays.toString() 方法属于 java.util 标准类库，用来产生一维数组可打印版本。当然上面的数组也可以在定义的同时进行初始化：`int[] a = new int[rand.nextInt(20)];`。如果可能的话，尽可能这么做。
+上面例子说明：数组元素中的基本数据类型会自动初始化成空值。**Arrays.toString()** 方法属于 **java.util** 标准类库，用来产生一维数组可打印版本。当然上面的数组也可以在定义的同时进行初始化：`int[] a = new int[rand.nextInt(20)];`。如果可能的话，尽可能这么做。
 
-如果创建的是一个非基本类型的数组，那么你就创建了一个引用数组。以整型包装器类 Integer 为例：
+如果创建的是一个非基本类型的数组，那么你就创建了一个引用数组。以整型包装器类 **Integer** 为例：
 
 ```java
 import java.util.*;
@@ -1849,3 +1849,100 @@ public class Example513 {
 
 ```
 
+即使通过 **new** 创建数组之后 `Integer[] a=new Integer[rand.nextInt(20)];`，它还只是一个引用数组，直到通过创建新的 **Integer** 对象，并且把对象值给引用，初始化才算结束：`a[i]=rand.nextInt(500);`。如果忘记创建对象，并且试图使用数组中的空引用，就会在运行时产生异常。
+
+也可以用花括号括起来的列表初始化对象数组。例子：
+
+```java
+import java.util.*;
+
+public class Example514 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Integer[] a = { 1, 2, 3 };
+		Integer[] b = new Integer[] { 1, 2, 3, };
+		System.out.println(Arrays.toString(a));
+		System.out.println(Arrays.toString(b));
+	}
+
+}/*
+	 * Output: 
+	 * [1, 2, 3] 
+	 * [1, 2, 3]
+	 */
+```
+
+在这两种形式中，初始化列表的最后一个逗号都是可选的，这一特性使维护长列表变得更容易。第一种形式虽然很有用，但是它也更加受限，因为它只能用于数组被定义之处。
+
+#### 5.8.1 可变参数列表
+
+
+
+### 5.9 枚举类型
+
+在 JDK1.5新增 **enum** 关键字，使得程序员在需要群组并使用枚举类型集时，可以很方便地处理。Java 中的 **enum** 功能比 C/C++ 更完备。例子：
+
+```java
+enum S {
+	NOT, MILD, MEDIUM, HOT, FLAMING
+}
+
+public class Example515 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		S howHot = S.MEDIUM;
+		System.out.println(howHot);
+
+		for (S j : S.values()) {
+			System.out.println(j + ", ordinal " + j.ordinal());
+		}
+
+		System.out.println("This burrito is ");
+		S s = S.HOT;
+		switch (s) {
+		case NOT:
+			System.out.println("not spicy at all.");
+			break;
+		case MILD:
+		case MEDIUM:
+			System.out.println("a little hot.");
+			break;
+		case HOT:
+		case FLAMING:
+		default:
+			System.out.println("maybe too hot.");
+
+		}
+	}
+
+}/*
+	 * Output: 
+	 * MEDIUM 
+	 * NOT, ordinal 0 
+	 * MILD, ordinal 1 
+	 * MEDIUM, ordinal 2 
+	 * HOT, ordinal 3 
+	 * FLAMING, ordinal 4 
+	 * This burrito is 
+	 * maybe too hot.
+	 */
+
+```
+
+在创建 **enum** 时，编译器会自动添加一些有用的特性。例如，会创建 **toString()** 方法，以便可以很方便地显示某个 **enum** 实例的名字，这正是上面打印语句如何产生输出的答案。编译器还会创建 **ordinal()** 方法，用来表示某个特定 **enum** 常量的声明顺序，以及 **static values()** 方法，用来按照 **enum** 常量的声明顺序。
+
+**enum** 还有一个特别实用的属性，它可以在 **switch** 语句内实用。
+
+大体上，可以将 **enum** 用作另一种创建数据类型的方式，然后直接将所得到的类型拿来使用。
+
+### 5.10 总结
+
+构造器，这种精巧的初始化机制，应该给人很强的暗示：初始化在 Java 中占有至关重要的地位。构造器能保证正确的初始化的清理（没有正确的构造器调用，编译器就不允许创建对象），所有有了完全的控制，也很安全。
+
+在 Java 中，垃圾回收器会自动为对象释放内存，所以在很多场合下，类似的清理方法在 Java 中就不太需要了。在不需要类似析构函数的行为的时候，Java 的垃圾回收器可以极大地简化编程工作，而且在处理内存的时候也更安全。然而垃圾回收器确实也增加了运行时的开销。
+
+## 第6章 访问权限控制
+
+**访问控制（或隐藏具体实现）与“最初的实现并不恰当”有关。** 
