@@ -113,3 +113,60 @@ GitHub 主页：分几个部分，左边是全部仓库，中间是关注的项�
 ![issue2](https://upload-images.jianshu.io/upload_images/19680844-87870b3c08ae3c3d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 git1 给 git2 提交一个 issue ，git2 可以在自己的主页看到。
+
+### 1.7 开源项目贡献流程
+
+1) 新建 issue
+
+提交试用问题或者建议或者想法。
+
+2）pull request
+
+步骤：
+
+1. fork 项目
+2. 修改自己仓库的代码
+3. 发起 pull request
+4. 等待开源项目作者审核
+
+## 2.使用 Git
+
+目的：通过 Git 管理 GitHub 托管项目代码
+
+### 2.1 下载安装
+
+1）Git 官网：https://www.git-scm.com
+
+2）双击安装
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-ec8009f4efb2f732.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-6c000544f6510b90.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+之后选择组件
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-405cdd80b323dbf6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-a22c11126bd46487.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-828e906e29c6161c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+然后直接默认 next 即可。
+
+#### 2.1.1 验证是否安装成功
+
+在桌面点击右键，如果出现下面情况，就是安装成功：
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-d26bf7937ef02bdd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+### 2.2 Git 工作流程
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-b38208e226ab4196.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+git status——查看文件状态
+
+git add +“文件名”——将工作区文件添加到暂存区
+
+git commit -m “提交描述”——暂存区文件添加到 git 仓库
+
+![image.png](https://upload-images.jianshu.io/upload_images/19680844-f15be78e503e94aa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
