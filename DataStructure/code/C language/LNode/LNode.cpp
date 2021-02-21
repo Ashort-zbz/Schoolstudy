@@ -110,3 +110,53 @@ bool GetElem(LinkList L, int i, ElemType &e){
     return true;
 }
 
+//王道考研复习指导&&课本————按值查找
+LinkList LocateElem(LinkList L, ElemType e){
+    LinkList p = L->next;
+    while(p!=NULL && p->data!=e){
+        p = p->next;
+    }
+    return p;
+}
+
+//在 i 处插入值为 e 的新结点
+bool ListInsert(LinkList &L, int i, ElemType e){
+//带头结点的单链表 L 中第 i 个位置插入值为 e 的新结点
+    LinkList p = L;
+    int j = 0;
+    while(p && (j<i-1)){
+        p = p->next;
+        ++j;
+    }
+    if(!p || j>i-1){
+        return false;
+    }
+    LinkList s = new LNode;
+    s->data = e;
+    s->next = p->next;
+    p->next = s;
+    return true;
+}
+
+//在 i 处删除结点
+bool ListDelete(LinkList &L, int i){
+    //在带头结点的单链表 L 中，删除第 i 个元素
+    LinkList p = L;
+    int j = 0;
+    /*
+    删除算法中的循环条件和插入的是有区别的，
+    因为插入操作中合法的插入位置有 n+1 个，
+    而删除操作中合法的删除位置只有 n 个。
+    */
+    while((p->next) && (j<i-1)){
+        p = p->next;
+        ++j;
+    }
+    if(!(p->next) || (j>i-1)){      //当 i>n 或者 i<1时，删除位置非法
+        return false;
+    }
+    LinkList q = p->next;       //临时保存被删除结点的地址
+    p->next = q->next;      //改变删除结点前驱结点的指针域
+    delete q;       //释放被删除结点的空间
+    return true;
+}
